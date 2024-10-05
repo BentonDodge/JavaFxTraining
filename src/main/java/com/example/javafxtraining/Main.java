@@ -1,128 +1,99 @@
 package com.example.javafxtraining;
 import javafx.application.Application;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
 public class Main extends Application {
-    public int a;
-    public int b;
+    public static HashMap<String, String> loginMap = new HashMap<>();
 
-    public String equation = "";
-
+    public static HashMap<String,Integer> finalMap = new HashMap<>();
     public static void main(String[] args) {
+        loginMap.put("Ben","Dodge");
+        finalMap.put("Ben",1000000000);
         launch(args);
     }
 
+
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("JavaFX without FXML");
+        primaryStage.setTitle("Silly Snowbank");
+        TextField userName = new TextField("");
+        userName.setPromptText("Username");
+        TextField password = new TextField("");
+        password.setPromptText("Password");
+        Button loginButton = new Button("Login");
+        loginButton.setOnAction(e -> login(userName.getText(),password.getText(),primaryStage));
+        
+        Button newAccount = new Button("New to Silly SnowBank?");
 
 
-        // Create UI components
-        Button button0 = new Button("0");
-        button0.setOnAction(e -> equation = equation + "0");
-
-        Button button1 = new Button("1");
-        button1.setOnAction(e -> equation = equation + "1");
-
-        Button button2 = new Button("2");
-        button2.setOnAction(e -> equation = equation + "2");
-
-        Button button3 = new Button("3");
-        button3.setOnAction(e -> equation = equation + "3");
-
-        Button button4 = new Button("4");
-        button4.setOnAction(e -> equation = equation + "4");
-
-        Button button5 = new Button("5");
-        button5.setOnAction(e -> equation = equation + "5");
-
-        Button button6 = new Button("6");
-        button6.setOnAction(e -> equation = equation + "6");
-
-        Button button7 = new Button("7");
-        button7.setOnAction(e -> equation = equation + "7");
-
-        Button button8 = new Button("8");
-        button8.setOnAction(e -> equation = equation + "8");
-
-        Button button9 = new Button("9");
-        button9.setOnAction(e -> equation = equation + "9");
-
-
-
-
-
-        Button buttonPlus = new Button("+");
-        buttonPlus.setOnAction(e -> equation = equation + "+");
-
-        Button buttonMinus = new Button("-");
-        buttonMinus.setOnAction(e -> equation = equation + "-");
-
-        Button buttonMultiply = new Button("*");
-        buttonMultiply.setOnAction(e -> equation = equation + "*");
-
-        Button buttonDivide = new Button("/");
-        buttonDivide.setOnAction(e -> equation = equation + "/");
-
-
-
-        Button buttonEnter = new Button("Enter");
-        buttonEnter.setOnAction(e -> out(equation));
-
-
-
-        HBox vbox = new HBox(button0,button1,button2,button3,button4,button5,
-                button6,button7,button8,button9,
-                buttonPlus,buttonMinus,buttonMultiply,buttonDivide,buttonEnter);
-        Scene scene = new Scene(vbox, 400, 200);
-
+        HBox hBox = new HBox(loginButton,newAccount);
+        VBox vBox = new VBox(userName,password,hBox);
+        Scene scene = new Scene(vBox,400, 500);
+        newAccount.setOnAction(e-> newAccount(primaryStage,scene));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-
-    public void out(String equation){
-        System.out.println(equation);
-        String[] splitEq = equation.split("[+*/-]");
-        System.out.println(splitEq[0] + "  " + splitEq[1]);
-        String opr = "";
-        if(equation.contains("+")){
-            opr = "+";
-        } else if(equation.contains("-")){
-            opr = "-";
-        }else if(equation.contains("*")){
-            opr = "*";
-        }else if(equation.contains("/")){
-            opr = "/";
-        }
-        System.out.println(Calculator(
-                parseInt(splitEq[0]),
-                parseInt(splitEq[1]),
-                opr));
-
+    public static void newAccount(Stage primaryStage, Scene oldScene){
+        TextField newUserName = new TextField("");
+        newUserName.setPromptText("Username");
+        TextField newPassword = new TextField("");
+        newPassword.setPromptText("Password");
+        Button submitButton = new Button("submit to Me");
+        VBox vBox = new VBox(newUserName,newPassword,submitButton);
+        Scene newAccountScene = new Scene(vBox);
+        primaryStage.setScene(newAccountScene);
+        primaryStage.show();
+        submitButton.setOnAction(e-> {
+            System.out.println("howdy");
+            loginMap.put(newUserName.getText(), newPassword.getText());
+            finalMap.put(newUserName.getText(),0);
+            primaryStage.setScene(oldScene);
+            primaryStage.show();
+        });
     }
-    public double Calculator(int a, int b,String operator){
-        double fin = 0;
-        switch (operator){
-            case("+") -> fin = a+b;
-            case("-") -> fin = a-b;
-            case("*") -> fin = a*b;
-            case("/") -> fin = (double) a/b;
-            default -> fin = 6.9;
-        }
-        return fin;
+    public static void login(String username, String password, Stage primaryStage){
+         if(Objects.equals(loginMap.get(username), password)){
+             Text money = new Text();
+             money.setText("$" + String.valueOf(finalMap.get(username)));
+             VBox CashDisplay = new VBox(money);
+             TextField Deposit = new TextField("");
+             Deposit.setPromptText("Money");
+             Button DepositButton = new Button("Deposit");
+             DepositButton.setOnAction(e -> {
+                 finalMap.replace(username,finalMap.get(username)+parseInt(Deposit.getText()));
+                 money.setText("$" + String.valueOf(finalMap.get(username)));
+             });
+
+             TextField Withdraw = new TextField("");
+             Withdraw.setPromptText("Money");
+             Button WithdrawButton = new Button("Withdraw");
+             WithdrawButton.setOnAction(e -> {
+                 finalMap.replace(username,finalMap.get(username)-(parseInt(Withdraw.getText())));
+                 money.setText("$" + String.valueOf(finalMap.get(username)));
+             });
+
+             HBox DepositCash = new HBox(Deposit,DepositButton);
+             HBox WithDrawCash = new HBox(Withdraw,WithdrawButton);
+
+             VBox Cash = new VBox(DepositCash,WithDrawCash);
+             SplitPane bankPane = new SplitPane(CashDisplay,Cash);
+             Scene bankScene = new Scene(bankPane,450,200);
+             primaryStage.setScene(bankScene);
+         }
     }
+
 }
-
-
-
-
-
-
-
